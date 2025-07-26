@@ -80,9 +80,9 @@ const SeatLayout = () => {
             if (!user) return toast.error("Please login to proceed")
             if (!selectedSeats.length || !selectedTime) return toast.error("Please select a time and seats")
             const { data } = await axios.post('api/booking/create', { showId: selectedTime.showId, selectedSeats }, { headers: { Authorization: `Bearer ${await getToken()}` } })
-        if(data.success){
-            window.location.href = data.url;
-        }
+            if (data.success) {
+                window.location.href = data.url;
+            }
 
         } catch (error) {
             toast.error(error.message);
