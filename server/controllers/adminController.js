@@ -15,7 +15,7 @@ export const getDashboardData = async (req, res) => {
         const totalUser = await User.countDocuments();
         const dashboardData = {
             totalBookings: bookings.length,
-            totalRevenue: bookings.reduce((acc, booking) => acc + booking.amount, 0),
+            totalRevenue: bookings.reduce((acc, booking) => acc + Number(booking.amount || 0), 0),
             activeShows,
             totalUser,
         }
