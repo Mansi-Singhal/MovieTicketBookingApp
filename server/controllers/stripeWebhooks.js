@@ -15,8 +15,8 @@ export const stripeWebhooks = async (request, response) => {
 
     try {
         switch (event.type) {
-            // case "payment_intent.succeeded": {
-            case "checkout.session.completed": {
+            case "payment_intent.succeeded": {
+            // case "checkout.session.completed": {
                 const paymentIntent = event.data.object;
                 const sessionList = await stripeInstance.checkout.sessions.list({
                     payment_intent: paymentIntent.id
@@ -47,7 +47,6 @@ export const stripeWebhooks = async (request, response) => {
                 console.log('Unhandled event type: ', event.type);
         }
         response.json({ received: true })
-
     } catch (error) {
         console.log("Webhook processing error: ", error);
         response.status(500).send("Internal server error")

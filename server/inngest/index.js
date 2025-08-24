@@ -50,7 +50,7 @@ const syncUserUpdation = inngest.createFunction(
 )
 
 // inngest function to cancel booking and release seats of show after 10 minutes of bookings created if payment is not made
-const releasSeatsAdnDeleteBooking = inngest.createFunction(
+const releaseSeatsAndDeleteBooking = inngest.createFunction(
     { id: 'release-seats-delete-booking' },
     { event: "app/checkpayment" },
     async ({ event, step }) => {
@@ -79,10 +79,10 @@ const sendBookingConfirmationEmail = inngest.createFunction(
     { id: "send-booking-confirmation-email" },
     { event: "app/show.booked" },
     async ({ event, step }) => {
-        const { bookingId } = event.date;
+        const { bookingId } = event.data;
         const booking = await Booking.findById(bookingId).populate({
             path: 'show',
-            populate: { path: 'movie', model: "movie" }
+            populate: { path: 'movie', model: "Movie" }
         }).populate('user');
 
         await sendEmail({
@@ -141,7 +141,7 @@ const sendShowReminders = inngest.createFunction(
         // send reminders emails
         const results = await step.run('send-all-reminders', async () => {
             return await Promise.allSettled(
-                reminderTasks, map(task => sendEmail({
+                reminderTasks.map(task => sendEmail({
                     to: task.userEmail,
                     subject: `Remainder : Your movie "${task.movieTitle}" starts soon!`,
                     body: `<div style="font-family: Arial, sans-serif; padding: 20px;">
@@ -149,7 +149,7 @@ const sendShowReminders = inngest.createFunction(
                         <p>This is a quick reminder that your movie:</p>
                         <h3 style="color: #F84565;">"${task.movieTitle}"</h3>
                         <p>
-                        is scheduled for <strong>${new Date(task.showTime).toLocaleDateString('en-US', { timeZone: 'Asia/Kolkata' })}</strong> at <strong> ${new Date(task.showTime).toLocaleTimeString('en-US', { timeZone: 'Asia/Kolaka' })}</strong>.
+                        is scheduled for <strong>${new Date(task.showTime).toLocaleDateString('en-US', { timeZone: 'Asia/Kolkata' })}</strong> at <strong> ${new Date(task.showTime).toLocaleTimeString('en-US', { timeZone: 'Asia/Kolkata' })}</strong>.
                         </p>
                         <p>It starts in approximately <strong>* hours</strong> - make sure you're ready!</p>
                         <br/>
@@ -201,7 +201,7 @@ export const functions = [
     syncUserCreation,
     syncUserDeletion,
     syncUserUpdation,
-    releasSeatsAdnDeleteBooking,
+    releaseSeatsAndDeleteBooking,
     sendBookingConfirmationEmail,
     sendShowReminders,
     sendNewShowNotifications,
